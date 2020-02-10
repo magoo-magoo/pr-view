@@ -1,14 +1,5 @@
 import { graphql } from '@octokit/graphql'
-import getConfig from 'next/config'
 import { Edge } from './pullRequest'
-
-// Only holds serverRuntimeConfig and publicRuntimeConfig
-const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
-// Will only be available on the server-side
-console.log(serverRuntimeConfig)
-// Will be available on both server-side and client-side
-console.log(publicRuntimeConfig)
-
 
 const graphqlApi = graphql.defaults({
 	baseUrl: 'https://api.github.com',
