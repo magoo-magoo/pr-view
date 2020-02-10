@@ -10,7 +10,7 @@ const MyApp: NextPage<AppProps> = ({ Component, pageProps }) => {
 	return (
 		<>
 			<Head>
-				<link rel="shortcut icon" href={favicon}/>
+				<link rel="shortcut icon" href={favicon} />
 			</Head>
 			<div>
 				<nav className="flex items-center justify-between flex-wrap bg-teal-700 p-6">

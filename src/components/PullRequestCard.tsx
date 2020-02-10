@@ -3,15 +3,24 @@ import { format } from 'timeago.js'
 import { PullRequest } from '../services/pullRequest'
 import fileIcon from '../../public/file.svg'
 import commentIcon from '../../public/comment.svg'
+import viewIcon from '../../public/view.svg'
 
 type Props = {
 	pullRequest: PullRequest
 }
 export const PullRequestCard: React.FC<Props> = ({ pullRequest }) => {
 	const borderColor = pullRequest.mergeable === 'MERGEABLE' ? 'gray' : 'red'
+	const opacity = pullRequest.state === 'OPEN' ? 'opacity-100' : 'opacity-25'
+	const reviewers = new Set(
+		pullRequest.reviews.nodes
+			.filter(x => x.author.login !== pullRequest.author.login)
+			.map(x => x.author.login)
+	)
 	return (
-		<div className="max-w-sm w-full lg:max-w-full lg:flex">
-			<div className={`w-full border-2 border-${borderColor}-400 bg-white rounded p-4 flex flex-col justify-between leading-normal`}>
+		<div className={`${opacity} max-w-sm w-full lg:max-w-full lg:flex`}>
+			<div
+				className={`w-full border-2 border-${borderColor}-400 bg-white rounded p-4 flex flex-col justify-between leading-normal`}
+			>
 				<div className="mb-4">
 					<div className="text-gray-900 font-bold text-xl mb-1">
 						<a href={pullRequest.url}>{pullRequest.title}</a>
@@ -69,21 +78,13 @@ export const PullRequestCard: React.FC<Props> = ({ pullRequest }) => {
 							</p>
 						</div>
 					</div>
-					<div className="text-sm float-right">
+					<div className="flex">
+						<img
+							className="w-5 h-5 rounded-full mr-1"
+							src={viewIcon}
+						/>
 						<p className="text-gray-900 leading-none">
-							Reviewers:{' '}
-							{
-								new Set(
-									pullRequest.reviews.nodes
-										.filter(
-											x =>
-												x.author.login !==
-												pullRequest.author.login
-										)
-										.map(x => x.author.login)
-								).size
-							}
-							locked: {pullRequest.activeLockReason}
+							{reviewers.size}
 						</p>
 					</div>
 				</div>

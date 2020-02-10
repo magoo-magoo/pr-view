@@ -16,7 +16,7 @@ export const pullRequestsService = {
 		} | null = await graphqlApi(`
 
 		  {
-			search(query: "${query} is:pr is:open", type: ISSUE, last: 100) {
+			search(query: "${query} is:pr", type: ISSUE, last: 100) {
 			  edges {
 				node {
 				  ... on PullRequest {
@@ -32,6 +32,7 @@ export const pullRequestsService = {
 					locked
 					mergeable
 					changedFiles
+					state
 					comments {
 					  totalCount
 					}
