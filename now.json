@@ -6,6 +6,6 @@
         "prview.magoo.dev"
     ],
     "env": {
-        "PR_VIEW_GITHUB_COM_TOKEN": "@githubToken"
+        "PR_VIEW_GITHUB_COM_TOKEN": "@githubtoken"
     }
 }
