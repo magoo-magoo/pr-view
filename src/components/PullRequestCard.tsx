@@ -9,7 +9,7 @@ type Props = {
 	pullRequest: PullRequest
 }
 export const PullRequestCard: React.FC<Props> = ({ pullRequest }) => {
-	const borderColor = pullRequest.mergeable === 'MERGEABLE' ? 'gray' : 'red'
+	const borderColor = pullRequest.mergeable === 'MERGEABLE' ? '' : 'border border-red'
 	const opacity = pullRequest.state === 'OPEN' ? 'opacity-100' : 'opacity-25'
 	const reviewers = new Set(
 		pullRequest.reviews.nodes
@@ -19,7 +19,7 @@ export const PullRequestCard: React.FC<Props> = ({ pullRequest }) => {
 	return (
 		<div className={`${opacity} max-w-sm w-full lg:max-w-full lg:flex`}>
 			<div
-				className={`w-full border-2 border-${borderColor}-400 bg-white rounded p-4 flex flex-col justify-between leading-normal`}
+				className={`w-full shadow-2xl ${borderColor}-400 bg-white rounded p-4 flex flex-col justify-between leading-normal`}
 			>
 				<div className="mb-4">
 					<div className="text-gray-900 font-bold text-xl mb-1">

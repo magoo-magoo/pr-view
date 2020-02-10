@@ -37,7 +37,7 @@ const HomePage: NextPage<Props> = ({ pullRequests }) => {
 				<input
 					value={query}
 					onChange={e => setQuery(e.target.value)}
-					className="w-1/2 bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block appearance-none leading-normal mr-2"
+					className="w-1/2 bg-white shadow focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block appearance-none leading-normal mr-2"
 				/>
 				<button
 					onClick={() => (location.href = `/?query=${query}`)}
