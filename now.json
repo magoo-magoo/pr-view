@@ -4,5 +4,8 @@
         "prview.now.sh",
         "pr.magoo.dev",
         "prview.magoo.dev"
-    ]
+    ],
+    "env": {
+        "PR_VIEW_GITHUB_COM_TOKEN": "@githubToken"
+    }
 }
