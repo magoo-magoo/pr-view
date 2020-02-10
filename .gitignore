@@ -1,3 +1,5 @@
+node_modules
+.vscode
 # Logs
 logs
 *.log
@@ -77,6 +79,7 @@ typings/
 
 # Next.js build output
 .next
+out
 
 # Nuxt.js build / generate output
 .nuxt
