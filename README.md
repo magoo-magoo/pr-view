@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./documentation/icon.svg" data-canonical-src="" width="10%" height="10%" >
+</p>
+
 # PRs View
 
 
