@@ -4,27 +4,34 @@ import { PullRequest } from '../services/pullRequest'
 import fileIcon from '../../public/file.svg'
 import commentIcon from '../../public/comment.svg'
 import viewIcon from '../../public/view.svg'
+import uniqBy from 'lodash/uniqBy'
 
 type Props = {
 	pullRequest: PullRequest
 }
 export const PullRequestCard: React.FC<Props> = ({ pullRequest }) => {
-	const borderColor = pullRequest.mergeable === 'MERGEABLE' ? '' : 'border border-red'
+	const borderColor =
+		pullRequest.mergeable === 'MERGEABLE' ? '' : 'border border-red'
 	const opacity = pullRequest.state === 'OPEN' ? 'opacity-100' : 'opacity-25'
-	const reviewers = new Set(
+	const reviewers = uniqBy(
 		pullRequest.reviews.nodes
-			.filter(x => x.author.login !== pullRequest.author.login)
-			.map(x => x.author.login)
+			.map(x => x.author)
+			.filter(x => x.login !== pullRequest.author.login),
+		'login'
 	)
 	return (
-		<div className={`${opacity} max-w-sm w-full lg:max-w-full lg:flex`}>
+		<div
+			className={`${opacity} max-w-sm w-full lg:max-w-full lg:flex group hover:shadow-2xl`}
+		>
 			<div
-				className={`w-full shadow-2xl ${borderColor}-400 bg-white rounded p-4 flex flex-col justify-between leading-normal`}
+				className={`w-full shadow-xl ${borderColor}-400 bg-white rounded p-4 flex flex-col justify-between leading-normal`}
 			>
 				<div className="mb-4">
-					<div className="text-gray-900 font-bold text-xl mb-1">
-						<a href={pullRequest.url}>{pullRequest.title}</a>
-					</div>
+					<a href={pullRequest.url}>
+						<div className="text-gray-900 font-bold text-xl mb-1">
+							{pullRequest.title}
+						</div>
+					</a>
 					<div className="text-gray-600 text-l mb-2">
 						<a href={pullRequest.repository.url}>
 							{pullRequest.repository.owner.login}/
@@ -32,29 +39,28 @@ export const PullRequestCard: React.FC<Props> = ({ pullRequest }) => {
 						</a>
 					</div>
 				</div>
-				<div className="flex items-center mb-4">
-					<a href={pullRequest.author.url}>
+
+				<a href={pullRequest.author.url}>
+					<div className="flex items-center mb-4">
 						<img
 							className="w-10 h-10 rounded-full mr-4"
 							src={pullRequest.author?.avatarUrl}
 							alt={`Avatar of ${pullRequest.author.login}`}
 						/>
-					</a>
-
-					<div className="text-sm">
-						<a href={pullRequest.author.url}>
+						<div className="text-sm">
 							<p className="text-gray-900 leading-none">
 								{pullRequest.author?.login}
 							</p>
-						</a>
-						<p className="text-gray-600">
-							{format(pullRequest.createdAt, 'en', {})}
-						</p>
+							<p className="text-gray-600">
+								{format(pullRequest.createdAt, 'en', {})}
+							</p>
+						</div>
 					</div>
-				</div>
-				<div className="flex justify-between gap-1 p-2">
-					<div>
-						<div className="flex">
+				</a>
+
+				<div className="flex justify-between p-2">
+					<div className="flex gap-1">
+						<div className="flex mr-1">
 							<img
 								className="w-5 h-5 rounded-full mr-1"
 								src={fileIcon}
@@ -84,7 +90,7 @@ export const PullRequestCard: React.FC<Props> = ({ pullRequest }) => {
 							src={viewIcon}
 						/>
 						<p className="text-gray-900 leading-none">
-							{reviewers.size}
+							{reviewers.length}
 						</p>
 					</div>
 				</div>
