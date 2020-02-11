@@ -84,14 +84,23 @@ export const PullRequestCard: React.FC<Props> = ({ pullRequest }) => {
 							</p>
 						</div>
 					</div>
-					<div className="flex">
-						<img
-							className="w-5 h-5 rounded-full mr-1"
-							src={viewIcon}
-						/>
-						<p className="text-gray-900 leading-none">
-							{reviewers.length}
-						</p>
+
+					<div className="flex flex-col">
+						<div className="flex">
+							<img
+								className="w-8 h-8 rounded-full mr-1"
+								src={viewIcon}
+							/>
+							{reviewers.map((x, i) => (
+								<img
+									key={i}
+									className="w-8 h-8 rounded-full"
+									src={x?.avatarUrl}
+									alt={`Avatar of ${x.login}`}
+								/>
+							))}
+
+						</div>
 					</div>
 				</div>
 			</div>
