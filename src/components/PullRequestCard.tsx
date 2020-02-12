@@ -24,7 +24,7 @@ export const PullRequestCard: React.FC<Props> = ({ pullRequest }) => {
 			className={`${opacity} max-w-sm w-full lg:max-w-full lg:flex group hover:shadow-2xl`}
 		>
 			<div
-				className={`w-full shadow-xl ${borderColor}-400 bg-white rounded p-4 flex flex-col justify-between leading-normal`}
+				className={`w-full shadow-xl ${borderColor}-400 bg-blue-100 rounded-lg p-4 flex flex-col justify-between leading-normal`}
 			>
 				<div className="mb-4">
 					<a href={pullRequest.url}>
@@ -85,7 +85,7 @@ export const PullRequestCard: React.FC<Props> = ({ pullRequest }) => {
 						</div>
 					</div>
 
-					<div className="flex flex-col">
+					<div className={`${reviewers.length === 0 ? 'hidden' : ''} flex flex-col`}>
 						<div className="flex">
 							<img
 								className="w-8 h-8 rounded-full mr-1"
@@ -99,7 +99,6 @@ export const PullRequestCard: React.FC<Props> = ({ pullRequest }) => {
 									alt={`Avatar of ${x.login}`}
 								/>
 							))}
-
 						</div>
 					</div>
 				</div>
