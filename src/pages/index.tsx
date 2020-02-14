@@ -65,6 +65,8 @@ const HomePage: NextPage<Props> = ({ initialLoad, pageInfo }) => {
 			lastItem
 		)
 
+		setLoading(false)
+		
 		if (!results) {
 			return
 		}
