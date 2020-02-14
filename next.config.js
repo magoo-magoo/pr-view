@@ -4,10 +4,8 @@ const withCSS = require('@zeit/next-css');
 const withImages = require('next-images')
 
 module.exports = (phase, { defaultConfig }) => {
-  return withImages(withCSS({
-    env: {
-        customKey: 'my-value',
-      },
-    /* config options for all phases except development here */
-  }))
+  var config = withImages(withCSS(defaultConfig))
+  config.target = 'serverless'
+  console.log({config})
+  return config
 }

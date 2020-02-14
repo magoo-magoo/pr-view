@@ -30,7 +30,6 @@ export const authenticate = async (ctx: NextPageContext) => {
 				}
 			)
 		).json()
-		console.log({ tokenResponse })
 
 		setCookie(ctx, 'gh_access_token', JSON.stringify(tokenResponse), {
 			maxAge: 30 * 24 * 60 * 60,
@@ -45,7 +44,6 @@ export const authenticate = async (ctx: NextPageContext) => {
 	} else {
 		// unauthenticated
 		const autorizeUrl = `${githubAuthorizeBaseUrl}/authorize?client_id=${client_id}&scope=${scope}&redirect_uri=${`${redirectUrl}${ctx.asPath}`}`
-		console.log({ autorizeUrl })
 		if (!ctx.req) {
 			location.href = autorizeUrl
 		} else {
