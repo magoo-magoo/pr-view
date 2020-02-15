@@ -20,7 +20,7 @@ export const PullRequestCard: React.FC<Props> = ({ pullRequest }) => {
 		'login'
 	)
 	return (
-		<div className="flex w-full justify-center sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 mb-4 m-2">
+		<div className="flex justify-center">
 			<div
 				className={`${opacity} max-w-sm w-full lg:max-w-full lg:flex group hover:shadow-2xl`}
 			>

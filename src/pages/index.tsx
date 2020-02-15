@@ -12,27 +12,32 @@ import { useWindowSize } from 'react-use'
 import { useState, useEffect } from 'react'
 import { notNullOrUndefined } from '../core/utils'
 import { Loading } from '../components/Loading'
+import { ParsedUrlQuery } from 'querystring'
 
 const defaultQuery = 'is:open org:facebook'
 
 type Props = {
 	initialLoad: readonly PullRequest[]
-	pageInfo: PageInfo
+	initialPageInfo: PageInfo
 }
-const HomePage: NextPage<Props> = ({ initialLoad, pageInfo }) => {
-	const { push, query } = useRouter()
+
+const extractGithubQueryFromUrl = (query: ParsedUrlQuery) =>
+	notNullOrUndefined(query.query)
+		? typeof query.query === 'string'
+			? query.query
+			: query.query[0]
+		: ''
+
+const HomePage: NextPage<Props> = ({ initialLoad, initialPageInfo }) => {
+	const { push, query: routerParsedUrlQuery } = useRouter()
 	const { height } = useWindowSize()
 
 	const [githubQuery, setGithubQuery] = useState(
-		notNullOrUndefined(query.query)
-			? typeof query.query === 'string'
-				? query.query
-				: query.query[0]
-			: ''
+		extractGithubQueryFromUrl(routerParsedUrlQuery)
 	)
-	const [canScroll, SetCanScroll] = useState(pageInfo.hasNextPage)
+	const [canScroll, SetCanScroll] = useState(initialPageInfo.hasNextPage)
 	const [items, setItems] = useState(initialLoad)
-	const [lastItem, setLastItem] = useState(pageInfo.endCursor)
+	const [lastItem, setLastItem] = useState(initialPageInfo.endCursor)
 	const [loading, setLoading] = useState(false)
 
 	useEffect(() => {
@@ -42,12 +47,15 @@ const HomePage: NextPage<Props> = ({ initialLoad, pageInfo }) => {
 			})
 			setGithubQuery(defaultQuery)
 		}
-	}, [githubQuery])
+	}, [githubQuery, initialLoad])
 
 	useEffect(() => {
 		setLoading(false)
 		setItems(initialLoad)
-	}, [initialLoad])
+		setLastItem(undefined)
+		setGithubQuery(extractGithubQueryFromUrl(routerParsedUrlQuery))
+		setLastItem(initialPageInfo.endCursor)
+	}, [initialLoad, initialPageInfo])
 
 	useEffect(() => {
 		setLoading(false)
@@ -73,20 +81,20 @@ const HomePage: NextPage<Props> = ({ initialLoad, pageInfo }) => {
 			return
 		}
 
-		setItems([...items, ...results.pullRequests.filter(notNullOrUndefined)])
+		setItems([...items, ...results.pullRequests])
 		setLastItem(results.pageInfo.endCursor)
 		SetCanScroll(results.pageInfo.hasNextPage)
 	}
 
 	return (
 		<div className="w-auto">
-			<div className="flex justify-center my-3">
+			<div className="flex flex-wrap justify-center my-3">
 				<input
 					value={githubQuery}
 					onChange={e => setGithubQuery(e.target.value)}
-					onKeyPress={async event => {
+					onKeyPress={event => {
 						if (event.key === 'Enter') {
-							await updateQuery()
+							updateQuery()
 						}
 					}}
 					className="lg:w-1/3 bg-blue-100 shadow focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block appearance-none leading-normal mr-2"
@@ -106,7 +114,7 @@ const HomePage: NextPage<Props> = ({ initialLoad, pageInfo }) => {
 				</button>
 			</div>
 			<InfiniteScroll
-				className="flex flex-wrap justify-center"
+				className="mx-4 flex flex-wrap justify-center"
 				pageStart={0}
 				loadMore={loadMoreItems}
 				hasMore={canScroll}
@@ -114,9 +122,9 @@ const HomePage: NextPage<Props> = ({ initialLoad, pageInfo }) => {
 				threshold={height}
 				loader={<Loading key={'loading-element'} />}
 			>
-				<div className="flex flex-wrap justify-center">
-					{items.map((pr, i) => (
-						<PullRequestCard key={i} pullRequest={pr} />
+				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+					{items.map(pr => (
+						<PullRequestCard key={pr.url} pullRequest={pr} />
 					))}
 				</div>
 			</InfiniteScroll>
@@ -125,14 +133,12 @@ const HomePage: NextPage<Props> = ({ initialLoad, pageInfo }) => {
 }
 
 HomePage.getInitialProps = async ctx => {
+	console.log('getInitialProps')
 	const { gh_access_token: cookie } = parseCookies(ctx)
 	if (cookie) {
 		let query: string = defaultQuery
 		if (ctx.query.query) {
-			query =
-				typeof ctx.query.query === 'string'
-					? ctx.query.query
-					: ctx.query.query[0]
+			query = extractGithubQueryFromUrl(ctx.query)
 		}
 
 		const effectiveQuery = typeof query === 'string' ? query : query[0]
@@ -144,7 +150,7 @@ HomePage.getInitialProps = async ctx => {
 		if (results) {
 			return {
 				initialLoad: results.pullRequests.filter(notNullOrUndefined),
-				pageInfo: results.pageInfo,
+				initialPageInfo: results.pageInfo,
 			}
 		}
 	}
@@ -153,7 +159,7 @@ HomePage.getInitialProps = async ctx => {
 
 	return {
 		initialLoad: [],
-		pageInfo: {
+		initialPageInfo: {
 			hasNextPage: false,
 			hasPreviousPage: false,
 			endCursor: '',

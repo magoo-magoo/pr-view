@@ -9,7 +9,7 @@ import '../../styles/main.css'
 
 const MyApp: NextPage<AppProps> = ({ Component, pageProps }) => {
 	return (
-		<div className="bg-blue-300">
+		<div className="bg-blue-300 min-h-screen">
 			<Head>
 				<title>PR View</title>
 				<meta charSet="utf-8" />
