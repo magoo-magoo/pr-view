@@ -36,24 +36,26 @@ const HomePage: NextPage<Props> = ({ initialLoad, pageInfo }) => {
 	const [loading, setLoading] = useState(false)
 
 	useEffect(() => {
-		console.log({ githubQuery })
 		if (!githubQuery) {
 			push(`/?query=${defaultQuery}`, `/?query=${defaultQuery}`, {
 				shallow: true,
 			})
-			console.log('reset')
 			setGithubQuery(defaultQuery)
 		}
-		setLoading(false)
 	}, [githubQuery])
 
 	useEffect(() => {
+		setLoading(false)
 		setItems(initialLoad)
 	}, [initialLoad])
 
+	useEffect(() => {
+		setLoading(false)
+	}, [items])
+
 	const updateQuery = () => {
-		push(`/?query=${githubQuery}`)
 		setLoading(true)
+		push(`/?query=${githubQuery}`)
 	}
 
 	const loadMoreItems = async () => {
@@ -66,7 +68,7 @@ const HomePage: NextPage<Props> = ({ initialLoad, pageInfo }) => {
 		)
 
 		setLoading(false)
-		
+
 		if (!results) {
 			return
 		}
@@ -82,9 +84,9 @@ const HomePage: NextPage<Props> = ({ initialLoad, pageInfo }) => {
 				<input
 					value={githubQuery}
 					onChange={e => setGithubQuery(e.target.value)}
-					onKeyPress={event => {
+					onKeyPress={async event => {
 						if (event.key === 'Enter') {
-							updateQuery()
+							await updateQuery()
 						}
 					}}
 					className="lg:w-1/3 bg-blue-100 shadow focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block appearance-none leading-normal mr-2"
