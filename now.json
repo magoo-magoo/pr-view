@@ -5,7 +5,6 @@
         "pr.magoo.dev"
     ],
     "env": {
-        "PR_VIEW_GITHUB_COM_TOKEN": "@githubtoken",
         "PR_VIEW_GITHUB_AUTHORIZE_BASE_URL": "https://github.com/login/oauth",
         "PR_VIEW_CLIENT_ID": "@clientid",
         "PR_VIEW_CLIENT_SECRET": "@clientsecret",

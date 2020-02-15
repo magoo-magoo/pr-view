@@ -69,7 +69,7 @@ const HomePage: NextPage<Props> = ({ initialLoad, initialPageInfo }) => {
 	const loadMoreItems = async () => {
 		const { gh_access_token: cookie } = parseCookies()
 
-		const results = await getPullRequests(
+		const results = await pullRequestsService.getAll(
 			githubQuery,
 			extractToken(cookie),
 			lastItem
@@ -136,15 +136,12 @@ HomePage.getInitialProps = async ctx => {
 	console.log('getInitialProps')
 	const { gh_access_token: cookie } = parseCookies(ctx)
 	if (cookie) {
-		let query: string = defaultQuery
-		if (ctx.query.query) {
-			query = extractGithubQueryFromUrl(ctx.query)
-		}
+		let query: string = ctx.query.query
+			? extractGithubQueryFromUrl(ctx.query)
+			: defaultQuery
 
-		const effectiveQuery = typeof query === 'string' ? query : query[0]
-
-		const results = await getPullRequests(
-			effectiveQuery,
+		const results = await pullRequestsService.getAll(
+			query,
 			extractToken(cookie)
 		)
 		if (results) {
@@ -159,26 +156,8 @@ HomePage.getInitialProps = async ctx => {
 
 	return {
 		initialLoad: [],
-		initialPageInfo: {
-			hasNextPage: false,
-			hasPreviousPage: false,
-			endCursor: '',
-			startCursor: '',
-		},
+		initialPageInfo: {},
 	}
-}
-
-async function getPullRequests(
-	effectiveQuery: string,
-	token: string,
-	after: string | null = null
-) {
-	const pullRequests = await pullRequestsService.getAll(
-		effectiveQuery,
-		token,
-		after
-	)
-	return pullRequests
 }
 
 export default HomePage

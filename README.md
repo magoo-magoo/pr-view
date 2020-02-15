@@ -4,14 +4,14 @@
 
 # PRs View
 
-
 `View GitHub pull requests`
 
 ## Built with
-- Next.JS
-- GraphQL
-- TailwindCSS
-- Typescript
+
+-   Next.JS
+-   GraphQL
+-   TailwindCSS
+-   Typescript
 
 ## Development
 
@@ -31,6 +31,18 @@ npm run dev
 
 ```sh
 npm run build
+```
+
+### Environment variables
+
+Some env vars are required by the app to run.
+
+```sh
+export PR_VIEW_GITHUB_AUTHORIZE_BASE_URL="https://github.com/login/oauth"
+export PR_VIEW_CLIENT_ID=XXXXXXXXXXXXXX
+export PR_VIEW_CLIENT_SECRET=XXXXXXXXXXXXXXX
+export PR_VIEW_REDIRECT_URL="https://pr.magoo.dev"
+export PR_VIEW_SCOPE="read:org user:email"
 ```
 
 ## Deployment

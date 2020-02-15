@@ -10,7 +10,7 @@ const graphqlApi = graphql.defaults({
 })
 
 export const pullRequestsService = {
-	getAll: async (query: string, token: string, after: string | null) => {
+	getAll: async (query: string, token: string, after: string | null = null) => {
 		try {
 			console.log(`getAll ${query} ${after} , ${token}`)
 			const results: {
