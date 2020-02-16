@@ -5,7 +5,6 @@ import { PullRequestCard } from '../components/PullRequestCard'
 import { useRouter } from 'next/router'
 import { PullRequest, PageInfo } from '../core/pullRequest'
 import { parseCookies } from 'nookies'
-import refreshIcon from '../../public/refresh.svg'
 import InfiniteScroll from 'react-infinite-scroller'
 import { authenticate, extractToken } from '../core/authentication'
 import { useWindowSize } from 'react-use'
@@ -13,151 +12,130 @@ import { useState, useEffect } from 'react'
 import { notNullOrUndefined } from '../core/utils'
 import { Loading } from '../components/Loading'
 import { ParsedUrlQuery } from 'querystring'
+import { SearchBar } from '../components/SearchBar'
+import uniqBy from 'lodash/uniqBy'
 
 const defaultQuery = 'is:open org:facebook'
 
 type Props = {
-	initialLoad: readonly PullRequest[]
-	initialPageInfo: PageInfo
+    initialLoad: readonly PullRequest[]
+    initialPageInfo: PageInfo
 }
 
-const extractGithubQueryFromUrl = (query: ParsedUrlQuery) =>
-	notNullOrUndefined(query.query)
-		? typeof query.query === 'string'
-			? query.query
-			: query.query[0]
-		: ''
+const getGithubQueryFromUrl = (query: ParsedUrlQuery) => {
+    if (!query.query) {
+        return ''
+    }
+    return typeof query.query === 'string' ? query.query : query.query[0]
+}
 
 const HomePage: NextPage<Props> = ({ initialLoad, initialPageInfo }) => {
-	const { push, query: routerParsedUrlQuery } = useRouter()
-	const { height } = useWindowSize()
+    const { push, query: parsedUrlQuery, events } = useRouter()
+    const { height } = useWindowSize()
 
-	const [githubQuery, setGithubQuery] = useState(
-		extractGithubQueryFromUrl(routerParsedUrlQuery)
-	)
-	const [canScroll, SetCanScroll] = useState(initialPageInfo.hasNextPage)
-	const [items, setItems] = useState(initialLoad)
-	const [lastItem, setLastItem] = useState(initialPageInfo.endCursor)
-	const [loading, setLoading] = useState(false)
+    const [githubQuery, setGithubQuery] = useState(
+        getGithubQueryFromUrl(parsedUrlQuery)
+    )
+    const [canScroll, SetCanScroll] = useState(initialPageInfo.hasNextPage)
+    const [items, setItems] = useState(initialLoad)
+    const [lastItem, setLastItem] = useState(initialPageInfo.endCursor)
+    const [loading, setLoading] = useState(true)
 
-	useEffect(() => {
-		if (!githubQuery) {
-			push(`/?query=${defaultQuery}`, `/?query=${defaultQuery}`, {
-				shallow: true,
-			})
-			setGithubQuery(defaultQuery)
-		}
-	}, [githubQuery, initialLoad])
+    events?.on('routeChangeStart', () => setLoading(true))
 
-	useEffect(() => {
-		setLoading(false)
-		setItems(initialLoad)
-		setLastItem(undefined)
-		setGithubQuery(extractGithubQueryFromUrl(routerParsedUrlQuery))
-		setLastItem(initialPageInfo.endCursor)
-	}, [initialLoad, initialPageInfo])
+    useEffect(() => {
+        if (!githubQuery) {
+            push(`/?query=${defaultQuery}`, `/?query=${defaultQuery}`, {
+                shallow: true,
+            })
+            setGithubQuery(defaultQuery)
+        }
+    }, [githubQuery, initialLoad])
 
-	useEffect(() => {
-		setLoading(false)
-	}, [items])
+    useEffect(() => {
+        setLoading(false)
+        setItems(initialLoad)
+        setGithubQuery(getGithubQueryFromUrl(parsedUrlQuery))
+        setLastItem(initialPageInfo.endCursor)
+        SetCanScroll(initialPageInfo.hasNextPage)
+    }, [initialLoad, initialPageInfo])
 
-	const updateQuery = () => {
-		setLoading(true)
-		push(`/?query=${githubQuery}`)
-	}
+    useEffect(() => {
+        setLoading(false)
+    }, [items])
 
-	const loadMoreItems = async () => {
-		const { gh_access_token: cookie } = parseCookies()
+    const loadMoreItems = async () => {
+        const { gh_access_token: cookie } = parseCookies()
 
-		const results = await pullRequestsService.getAll(
-			githubQuery,
-			extractToken(cookie),
-			lastItem
-		)
+        const results = await pullRequestsService.getAll(
+            githubQuery,
+            extractToken(cookie),
+            lastItem
+        )
 
-		setLoading(false)
+        setLoading(false)
 
-		if (!results) {
-			return
-		}
+        if (!results) {
+            return
+        }
 
-		setItems([...items, ...results.pullRequests])
-		setLastItem(results.pageInfo.endCursor)
-		SetCanScroll(results.pageInfo.hasNextPage)
-	}
+        setItems(uniqBy([...items, ...results.pullRequests], 'url'))
+        setLastItem(results.pageInfo.endCursor)
+        SetCanScroll(results.pageInfo.hasNextPage)
+    }
 
-	return (
-		<div className="w-auto">
-			<div className="flex flex-wrap justify-center my-3">
-				<input
-					value={githubQuery}
-					onChange={e => setGithubQuery(e.target.value)}
-					onKeyPress={event => {
-						if (event.key === 'Enter') {
-							updateQuery()
-						}
-					}}
-					className="lg:w-1/3 bg-blue-100 shadow focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block appearance-none leading-normal mr-2"
-				/>
-				<button
-					onClick={updateQuery}
-					className="bg-blue-500 w-24 flex justify-center hover:bg-blue-400 text-blue-800 font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
-				>
-					{loading ? (
-						<img
-							className="spinner fill-current text-white"
-							src={refreshIcon}
-						/>
-					) : (
-						'Update'
-					)}
-				</button>
-			</div>
-			<InfiniteScroll
-				className="mx-4 flex flex-wrap justify-center"
-				pageStart={0}
-				loadMore={loadMoreItems}
-				hasMore={canScroll}
-				initialLoad={true}
-				threshold={height}
-				loader={<Loading key={'loading-element'} />}
-			>
-				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-					{items.map(pr => (
-						<PullRequestCard key={pr.url} pullRequest={pr} />
-					))}
-				</div>
-			</InfiniteScroll>
-		</div>
-	)
+    return (
+        <>
+            <SearchBar
+                loading={loading}
+                githubQuery={githubQuery}
+                setGithubQuery={setGithubQuery}
+            />
+            <InfiniteScroll
+                className="mx-4 flex flex-wrap justify-center"
+                pageStart={0}
+                loadMore={loadMoreItems}
+                hasMore={canScroll}
+                initialLoad={true}
+                threshold={height}
+                loader={<Loading key={'loading-element'} />}
+            >
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {items.map(pr => (
+                        <PullRequestCard key={pr.url} pullRequest={pr} />
+                    ))}
+                </div>
+            </InfiniteScroll>
+        </>
+    )
 }
 
 HomePage.getInitialProps = async ctx => {
-	console.log('getInitialProps')
-	const { gh_access_token: cookie } = parseCookies(ctx)
-	if (cookie) {
-		let query: string = ctx.query.query
-			? extractGithubQueryFromUrl(ctx.query)
-			: defaultQuery
+    console.log('getInitialProps')
+    const { gh_access_token: cookie } = parseCookies(ctx)
+    if (cookie) {
+        let query: string = ctx.query.query
+            ? getGithubQueryFromUrl(ctx.query)
+            : defaultQuery
 
-		const results = await pullRequestsService.getAll(
-			query,
-			extractToken(cookie)
-		)
-		if (results) {
-			return {
-				initialLoad: results.pullRequests.filter(notNullOrUndefined),
-				initialPageInfo: results.pageInfo,
-			}
-		}
-	}
+        const results = await pullRequestsService.getAll(
+            query,
+            extractToken(cookie)
+        )
+        if (results) {
+            return {
+                initialLoad: results.pullRequests.filter(notNullOrUndefined),
+                initialPageInfo: results.pageInfo,
+            }
+        }
+    }
 
-	await authenticate(ctx)
+    await authenticate(ctx)
 
-	return {
-		initialLoad: [],
-		initialPageInfo: {},
-	}
+    return {
+        initialLoad: [],
+        initialPageInfo: {},
+    }
 }
 
 export default HomePage
