@@ -17,11 +17,10 @@ export const pullRequestsService = {
         token: string,
         after: string | null = null
     ) => {
+        const queryKey = `${query}-${token}-${after}`
 
-
-		// prevent to perform twice the same query on browser side
-		if (typeof window !== 'undefined') {
-			const queryKey = `${query}-${token}-${after}`
+        // prevent to perform twice the same query on browser side
+        if (typeof window !== 'undefined') {
             if (queries[queryKey]) {
                 return {
                     pullRequests: [] as PullRequest[],
@@ -99,6 +98,8 @@ export const pullRequestsService = {
                     },
                 }
             )
+
+            delete queries[queryKey]
 
             const pullRequests =
                 results?.search?.edges
