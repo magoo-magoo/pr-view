@@ -54,7 +54,7 @@ const HomePage: NextPage<Props> = ({ initialLoad, initialPageInfo }) => {
             })
             setGithubQuery(defaultQuery)
         }
-    }, [githubQuery, initialLoad])
+    }, [githubQuery, initialLoad, parsedUrlQuery])
 
     useEffect(() => {
         setLoading(false)
