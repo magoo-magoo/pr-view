@@ -17,16 +17,20 @@ export const pullRequestsService = {
         token: string,
         after: string | null = null
     ) => {
-        const queryKey = `${query}-${token}-${after}`
 
-        if (queries[queryKey]) {
-            return {
-                pullRequests: [] as PullRequest[],
-                pageInfo: {},
-                status: 'ALREADY_RUNNING',
-            } as const
+
+		// prevent to perform twice the same query on browser side
+		if (typeof window !== 'undefined') {
+			const queryKey = `${query}-${token}-${after}`
+            if (queries[queryKey]) {
+                return {
+                    pullRequests: [] as PullRequest[],
+                    pageInfo: {},
+                    status: 'ALREADY_RUNNING',
+                } as const
+            }
+            queries[queryKey] = 1
         }
-        queries[queryKey] = 1
 
         try {
             console.log(`getAll ${query} ${after} , ${token}`)
@@ -115,8 +119,8 @@ export const pullRequestsService = {
                 hasPreviousPage: false,
                 endCursor: '',
                 startCursor: '',
-			},
-			status: 'ERRORED'
+            },
+            status: 'ERRORED',
         } as const
     },
 }

@@ -15,7 +15,7 @@ import { ParsedUrlQuery } from 'querystring'
 import { SearchBar } from '../components/SearchBar'
 import uniqBy from 'lodash/uniqBy'
 
-const defaultQuery = 'is:open org:facebook'
+const defaultQuery = 'is:open org:facebook org:netflix repo:magoo-magoo/keyrier-json'
 
 type Props = {
     initialLoad: readonly PullRequest[]
@@ -118,6 +118,7 @@ const HomePage: NextPage<Props> = ({ initialLoad, initialPageInfo }) => {
 HomePage.getInitialProps = async ctx => {
     console.log('getInitialProps')
     const { gh_access_token: cookie } = parseCookies(ctx)
+    console.log({cookie})
     if (cookie) {
         let query: string = ctx.query.query
             ? getGithubQueryFromUrl(ctx.query)
@@ -127,12 +128,14 @@ HomePage.getInitialProps = async ctx => {
             query,
             extractToken(cookie)
         )
+        console.log({ pageInfo: results?.pageInfo, status: results?.status})
         if (results) {
             return {
                 initialLoad: results.pullRequests.filter(notNullOrUndefined),
                 initialPageInfo: results.pageInfo,
             }
         }
+        
     }
 
     await authenticate(ctx)
