@@ -78,6 +78,11 @@ const HomePage: NextPage<Props> = ({ initialLoad, initialPageInfo }) => {
         if (!results) {
             return
         }
+        console.log(results.status)
+
+        if (results.status === 'ALREADY_RUNNING') {
+            return
+        }
 
         setItems(uniqBy([...items, ...results.pullRequests], 'url'))
         setLastItem(results.pageInfo.endCursor)
@@ -85,14 +90,14 @@ const HomePage: NextPage<Props> = ({ initialLoad, initialPageInfo }) => {
     }
 
     return (
-        <>
+        <div className="mx-4">
             <SearchBar
                 loading={loading}
                 githubQuery={githubQuery}
                 setGithubQuery={setGithubQuery}
             />
             <InfiniteScroll
-                className="mx-4 flex flex-wrap justify-center"
+                className="flex flex-wrap justify-center"
                 pageStart={0}
                 loadMore={loadMoreItems}
                 hasMore={canScroll}
@@ -106,7 +111,7 @@ const HomePage: NextPage<Props> = ({ initialLoad, initialPageInfo }) => {
                     ))}
                 </div>
             </InfiniteScroll>
-        </>
+        </div>
     )
 }
 

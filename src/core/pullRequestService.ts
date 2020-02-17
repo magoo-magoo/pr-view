@@ -1,5 +1,5 @@
 import { graphql } from '@octokit/graphql'
-import { Search } from './pullRequest'
+import { Search, PullRequest } from './pullRequest'
 import { notNullOrUndefined } from './utils'
 
 const githubApiBaseUrl = 'https://api.github.com' // process.env.PR_VIEW_GITHUB_BASE_URL //
@@ -9,12 +9,25 @@ const graphqlApi = graphql.defaults({
     url: url,
 })
 
+const queries: any = {}
+
 export const pullRequestsService = {
     getAll: async (
         query: string,
         token: string,
         after: string | null = null
     ) => {
+        const queryKey = `${query}-${token}-${after}`
+
+        if (queries[queryKey]) {
+            return {
+                pullRequests: [] as PullRequest[],
+                pageInfo: {},
+                status: 'ALREADY_RUNNING',
+            } as const
+        }
+        queries[queryKey] = 1
+
         try {
             console.log(`getAll ${query} ${after} , ${token}`)
             const results: {
@@ -42,8 +55,6 @@ export const pullRequestsService = {
 						}
 						title
 						createdAt
-						activeLockReason
-						locked
 						mergeable
 						changedFiles
 						state
@@ -90,7 +101,7 @@ export const pullRequestsService = {
                     ?.map(x => x.node)
                     .filter(notNullOrUndefined) ?? []
             const pageInfo = results?.search?.pageInfo ?? {}
-            return { pullRequests, pageInfo }
+            return { pullRequests, pageInfo, status: 'FINISHED' } as const
         } catch (error) {
             console.error(JSON.stringify(error))
             if (error.status === 401) {
@@ -98,13 +109,14 @@ export const pullRequestsService = {
             }
         }
         return {
-            pullRequests: [],
+            pullRequests: [] as PullRequest[],
             pageInfo: {
                 hasNextPage: false,
                 hasPreviousPage: false,
                 endCursor: '',
                 startCursor: '',
-            } as const,
-        }
+			},
+			status: 'ERRORED'
+        } as const
     },
 }
