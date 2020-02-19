@@ -1,6 +1,6 @@
 import { graphql } from '@octokit/graphql'
 import { Search, PullRequest } from './pullRequest'
-import { notNullOrUndefined } from './utils'
+import { notNullOrUndefined, isClientSide } from './utils'
 
 const githubApiBaseUrl = 'https://api.github.com' // process.env.PR_VIEW_GITHUB_BASE_URL //
 const url = '/graphql' // process.env.PR_VIEW_GITHUB_GRAPHQL_URL //
@@ -20,7 +20,7 @@ export const pullRequestsService = {
         const queryKey = `${query}-${token}-${after}`
 
         // prevent to perform twice the same query on browser side
-        if (typeof window !== 'undefined') {
+        if (isClientSide()) {
             if (queries[queryKey]) {
                 return {
                     pullRequests: [] as PullRequest[],
@@ -99,7 +99,9 @@ export const pullRequestsService = {
                 }
             )
 
-            delete queries[queryKey]
+            if (isClientSide()) {
+                delete queries[queryKey]
+            }
 
             const pullRequests =
                 results?.search?.edges

@@ -66,7 +66,13 @@ export const SearchBar: FC<Props> = ({
                 </button>
                 <input
                     value={githubQuery}
-                    onChange={e => setGithubQuery(e.target.value)}
+                    onChange={e => {
+                        if (e.target.value === '') {
+                            setGithubQuery(' ')
+                        } else {
+                            setGithubQuery(e.target.value)
+                        }
+                    }}
                     onKeyPress={event => {
                         if (event.key === 'Enter') {
                             updateQuery()

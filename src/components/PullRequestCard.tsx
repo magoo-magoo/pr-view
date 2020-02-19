@@ -5,11 +5,26 @@ import fileIcon from '../../public/file.svg'
 import commentIcon from '../../public/comment.svg'
 import viewIcon from '../../public/view.svg'
 import uniqBy from 'lodash/uniqBy'
-import LazyLoad from 'react-lazyload'
+import avatarPlaceHolder from '../../public/avatar_placeholder.png'
+import { FC } from 'react'
+import { LazyAvatar } from './LazyAvatar'
 
 type Props = {
     pullRequest: PullRequest
 }
+
+type APProps = {
+    size: number
+    url: string | undefined
+}
+
+const AvatarPlaceHolder: FC<APProps> = ({ size, url }) => (
+    <img
+        className={`w-${size} h-${size} rounded-full mr-4`}
+        src={url ? `${url}&s=${size}` : avatarPlaceHolder}
+    />
+)
+
 export const PullRequestCard: React.FC<Props> = ({ pullRequest }) => {
     const borderColor =
         pullRequest.mergeable === 'MERGEABLE' ? '' : 'border border-red'
@@ -44,13 +59,11 @@ export const PullRequestCard: React.FC<Props> = ({ pullRequest }) => {
 
                     <a href={pullRequest.author?.url}>
                         <div className="flex items-center mb-4">
-                            <LazyLoad height={10} once={true}>
-                                <img
-                                    className="w-10 h-10 rounded-full mr-4"
-                                    src={`${pullRequest.author?.avatarUrl}&s=48`}
-                                    alt={`Avatar of ${pullRequest.author?.login}`}
-                                />
-                            </LazyLoad>
+                            <LazyAvatar
+                                url={pullRequest.author?.avatarUrl}
+                                alt={`Avatar of ${pullRequest.author?.login}`}
+                                size={10}
+                            />
                             <div className="text-sm">
                                 <p className="text-gray-900 leading-none">
                                     {pullRequest.author?.login}
@@ -102,13 +115,29 @@ export const PullRequestCard: React.FC<Props> = ({ pullRequest }) => {
                                     src={viewIcon}
                                 />
                                 {reviewers.map((x, i) => (
-                                    <LazyLoad key={i} height={10} once={true}>
-                                        <img
-                                            className="lazyload w-8 h-8 rounded-full"
-                                            src={`${x?.avatarUrl}&s=48`}
-                                            alt={`Avatar of ${x?.login}`}
-                                        />
-                                    </LazyLoad>
+                                    <LazyAvatar
+                                        url={x?.avatarUrl}
+                                        alt={`Avatar of ${x?.login}`}
+                                        size={8}
+                                        key={i}
+                                    />
+                                    // <LazyLoad
+                                    //     key={i}
+                                    //     throttle={2500}
+                                    //     offset={250}
+                                    //     placeholder={
+                                    //         <AvatarPlaceHolder
+                                    //             size={8}
+                                    //             url={x?.avatarUrl}
+                                    //         />
+                                    //     }
+                                    // >
+                                    //     <img
+                                    //         className="lazyload w-8 h-8 rounded-full"
+                                    //         src={`${x?.avatarUrl}&s=48`}
+                                    //         alt={`Avatar of ${x?.login}`}
+                                    //     />
+                                    // </LazyLoad>
                                 ))}
                             </div>
                         </div>

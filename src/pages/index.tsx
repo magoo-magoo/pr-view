@@ -42,7 +42,10 @@ const HomePage: NextPage<Props> = ({ initialLoad, initialPageInfo }) => {
     const [lastItem, setLastItem] = useState(initialPageInfo.endCursor)
     const [loading, setLoading] = useState(true)
 
-    events?.on('routeChangeStart', () => setLoading(true))
+    events?.on('routeChangeStart', event => {
+        console.log('routeChangeStart', event)
+        setLoading(true)
+    })
 
     useEffect(() => {
         console.log({ githubQuery })
@@ -66,7 +69,7 @@ const HomePage: NextPage<Props> = ({ initialLoad, initialPageInfo }) => {
 
     useEffect(() => {
         setLoading(false)
-    }, [items])
+    }, [items, initialLoad, initialPageInfo])
 
     const loadMoreItems = async () => {
         const { gh_access_token: cookie } = parseCookies()
@@ -108,7 +111,7 @@ const HomePage: NextPage<Props> = ({ initialLoad, initialPageInfo }) => {
                 initialLoad={true}
                 threshold={height}
                 loader={<Loading key={'loading-element'} />}
-            >
+            > 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {items.map(pr => (
                         <PullRequestCard key={pr.url} pullRequest={pr} />

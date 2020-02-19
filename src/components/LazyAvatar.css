@@ -1,0 +1,14 @@
+.lazy-avatar-enter {
+    opacity: 0;
+}
+.lazy-avatar-enter-active {
+    opacity: 1;
+    transition: opacity 1200ms;
+}
+.lazy-avatar-exit {
+    opacity: 1;
+}
+.lazy-avatar-exit-active {
+    opacity: 0;
+    transition: opacity 1200ms;
+}
