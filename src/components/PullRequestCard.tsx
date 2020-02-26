@@ -13,18 +13,6 @@ type Props = {
     pullRequest: PullRequest
 }
 
-type APProps = {
-    size: number
-    url: string | undefined
-}
-
-const AvatarPlaceHolder: FC<APProps> = ({ size, url }) => (
-    <img
-        className={`w-${size} h-${size} rounded-full mr-4`}
-        src={url ? `${url}&s=${size}` : avatarPlaceHolder}
-    />
-)
-
 export const PullRequestCard: React.FC<Props> = ({ pullRequest }) => {
     const borderColor =
         pullRequest.mergeable === 'MERGEABLE' ? '' : 'border border-red'
@@ -121,23 +109,6 @@ export const PullRequestCard: React.FC<Props> = ({ pullRequest }) => {
                                         size={8}
                                         key={i}
                                     />
-                                    // <LazyLoad
-                                    //     key={i}
-                                    //     throttle={2500}
-                                    //     offset={250}
-                                    //     placeholder={
-                                    //         <AvatarPlaceHolder
-                                    //             size={8}
-                                    //             url={x?.avatarUrl}
-                                    //         />
-                                    //     }
-                                    // >
-                                    //     <img
-                                    //         className="lazyload w-8 h-8 rounded-full"
-                                    //         src={`${x?.avatarUrl}&s=48`}
-                                    //         alt={`Avatar of ${x?.login}`}
-                                    //     />
-                                    // </LazyLoad>
                                 ))}
                             </div>
                         </div>
