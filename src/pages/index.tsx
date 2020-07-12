@@ -1,19 +1,19 @@
-import * as React from 'react'
-import { NextPage } from 'next'
-import { pullRequestsService } from '../core/pullRequestService'
-import { PullRequestCard } from '../components/PullRequestCard'
-import { useRouter } from 'next/router'
-import { PullRequest, PageInfo } from '../core/pullRequest'
-import { parseCookies } from 'nookies'
-import InfiniteScroll from 'react-infinite-scroller'
-import { authenticate, extractToken } from '../core/authentication'
-import { useWindowSize } from 'react-use'
-import { useState, useEffect } from 'react'
-import { notNullOrUndefined } from '../core/utils'
-import { Loading } from '../components/Loading'
-import { ParsedUrlQuery } from 'querystring'
-import { SearchBar } from '../components/SearchBar'
 import uniqBy from 'lodash/uniqBy'
+import { NextPage } from 'next'
+import { useRouter } from 'next/router'
+import { parseCookies } from 'nookies'
+import { ParsedUrlQuery } from 'querystring'
+import * as React from 'react'
+import { useEffect, useState } from 'react'
+import InfiniteScroll from 'react-infinite-scroller'
+import { useWindowSize } from 'react-use'
+import { Loading } from '../components/Loading'
+import { PullRequestCard } from '../components/PullRequestCard'
+import { SearchBar } from '../components/SearchBar'
+import { authenticate, extractToken } from '../core/authentication'
+import { PageInfo, PullRequest } from '../core/pullRequest'
+import { pullRequestsService } from '../core/pullRequestService'
+import { notNullOrUndefined } from '../core/utils'
 
 const defaultQuery =
     'is:open org:facebook org:netflix repo:magoo-magoo/keyrier-json'
@@ -40,18 +40,18 @@ const HomePage: NextPage<Props> = ({ initialLoad, initialPageInfo }) => {
     const [canScroll, SetCanScroll] = useState(initialPageInfo.hasNextPage)
     const [items, setItems] = useState(initialLoad)
     const [lastItem, setLastItem] = useState(initialPageInfo.endCursor)
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(false)
 
     events?.on('routeChangeStart', event => {
-        console.log('routeChangeStart', event)
+        console.debug('routeChangeStart', event)
         setLoading(true)
     })
 
     useEffect(() => {
-        console.log({ githubQuery })
+        console.debug({ githubQuery })
 
         if (!githubQuery) {
-            console.log('githubQuery is empty')
+            console.debug('githubQuery is empty')
             push(`/?query=${defaultQuery}`, `/?query=${defaultQuery}`, {
                 shallow: true,
             })
@@ -85,7 +85,7 @@ const HomePage: NextPage<Props> = ({ initialLoad, initialPageInfo }) => {
         if (!results) {
             return
         }
-        console.log(results.status)
+        console.debug(results.status)
 
         if (results.status === 'ALREADY_RUNNING') {
             return
@@ -111,7 +111,7 @@ const HomePage: NextPage<Props> = ({ initialLoad, initialPageInfo }) => {
                 initialLoad={true}
                 threshold={height}
                 loader={<Loading key={'loading-element'} />}
-            > 
+            >
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {items.map(pr => (
                         <PullRequestCard key={pr.url} pullRequest={pr} />
@@ -123,9 +123,8 @@ const HomePage: NextPage<Props> = ({ initialLoad, initialPageInfo }) => {
 }
 
 HomePage.getInitialProps = async ctx => {
-    console.log('getInitialProps')
+    console.debug('getInitialProps')
     const { gh_access_token: cookie } = parseCookies(ctx)
-    console.log({ cookie })
     if (cookie) {
         let query: string = ctx.query.query
             ? getGithubQueryFromUrl(ctx.query)
@@ -135,7 +134,7 @@ HomePage.getInitialProps = async ctx => {
             query,
             extractToken(cookie)
         )
-        console.log({ pageInfo: results?.pageInfo, status: results?.status })
+        console.debug({ pageInfo: results?.pageInfo, status: results?.status })
         if (results) {
             return {
                 initialLoad: results.pullRequests.filter(notNullOrUndefined),

@@ -32,7 +32,7 @@ export const pullRequestsService = {
         }
 
         try {
-            console.log(`getAll ${query} ${after} , ${token}`)
+            console.debug(`getAll ${query} ${after} , ${token}`)
             const results: {
                 search?: Search
             } | null = await graphqlApi(
