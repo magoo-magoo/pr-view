@@ -5,5 +5,5 @@
   {
     "packagePatterns": ["^@types/"],
     "groupName": "typings packages"
-  },
+  }
 }
