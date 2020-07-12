@@ -32,7 +32,6 @@ export const pullRequestsService = {
         }
 
         try {
-            console.debug(`getAll ${query} ${after} , ${token}`)
             const results: {
                 search?: Search
             } | null = await graphqlApi(

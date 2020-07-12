@@ -43,15 +43,11 @@ const HomePage: NextPage<Props> = ({ initialLoad, initialPageInfo }) => {
     const [loading, setLoading] = useState(false)
 
     events?.on('routeChangeStart', event => {
-        console.debug('routeChangeStart', event)
         setLoading(true)
     })
 
     useEffect(() => {
-        console.debug({ githubQuery })
-
         if (!githubQuery) {
-            console.debug('githubQuery is empty')
             push(`/?query=${defaultQuery}`, `/?query=${defaultQuery}`, {
                 shallow: true,
             })
@@ -85,7 +81,6 @@ const HomePage: NextPage<Props> = ({ initialLoad, initialPageInfo }) => {
         if (!results) {
             return
         }
-        console.debug(results.status)
 
         if (results.status === 'ALREADY_RUNNING') {
             return
@@ -123,7 +118,6 @@ const HomePage: NextPage<Props> = ({ initialLoad, initialPageInfo }) => {
 }
 
 HomePage.getInitialProps = async ctx => {
-    console.debug('getInitialProps')
     const { gh_access_token: cookie } = parseCookies(ctx)
     if (cookie) {
         let query: string = ctx.query.query
@@ -134,7 +128,6 @@ HomePage.getInitialProps = async ctx => {
             query,
             extractToken(cookie)
         )
-        console.debug({ pageInfo: results?.pageInfo, status: results?.status })
         if (results) {
             return {
                 initialLoad: results.pullRequests.filter(notNullOrUndefined),
