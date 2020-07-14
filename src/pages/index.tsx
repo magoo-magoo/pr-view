@@ -1,5 +1,5 @@
 import uniqBy from 'lodash/uniqBy'
-import { NextPage } from 'next'
+import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { parseCookies } from 'nookies'
 import nProgress from 'nprogress'
@@ -143,7 +143,7 @@ const HomePage: NextPage<Props> = ({ initialLoad, initialPageInfo }) => {
 }
 
 // This gets called on every request
-export async function getServerSideProps(ctx: any) {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const { gh_access_token: cookie } = parseCookies(ctx)
     if (cookie) {
         let query: string = ctx.query.query
