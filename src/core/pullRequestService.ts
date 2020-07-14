@@ -1,6 +1,6 @@
 import { graphql } from '@octokit/graphql'
-import { Search, PullRequest } from './pullRequest'
-import { notNullOrUndefined, isClientSide } from './utils'
+import { PullRequest, Search } from './pullRequest'
+import { isClientSide, notNullOrUndefined } from './utils'
 
 const githubApiBaseUrl = 'https://api.github.com' // process.env.PR_VIEW_GITHUB_BASE_URL //
 const url = '/graphql' // process.env.PR_VIEW_GITHUB_GRAPHQL_URL //
@@ -104,7 +104,7 @@ export const pullRequestsService = {
 
             const pullRequests =
                 results?.search?.edges
-                    ?.map(x => x.node)
+                    ?.map((x) => x.node)
                     .filter(notNullOrUndefined) ?? []
             const pageInfo = results?.search?.pageInfo ?? {}
             return { pullRequests, pageInfo, status: 'FINISHED' } as const

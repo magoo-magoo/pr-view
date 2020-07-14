@@ -1,6 +1,4 @@
-import React, { useState } from 'react'
-import { FC } from 'react'
-import { useRouter } from 'next/router'
+import React, { FC, useState } from 'react'
 
 export type GithubQuery = {
     is: string[]
@@ -13,9 +11,9 @@ const parseGithubQuery = (stringQuery: string) => {
         org: [],
         repo: [],
     }
-    const tokens = stringQuery.split(' ').map(x => x.trim().toLowerCase())
+    const tokens = stringQuery.split(' ').map((x) => x.trim().toLowerCase())
 
-    tokens.forEach(x => {
+    tokens.forEach((x) => {
         if (x.startsWith('is:') && x.length > 3) {
             queryObject.is.push(x.substring(3).trim())
         } else if (x.startsWith('org:') && x.length > 4) {
@@ -29,24 +27,20 @@ const parseGithubQuery = (stringQuery: string) => {
 }
 
 type Props = {
-    githubQuery: string
-    setGithubQuery: (v: string) => void
+    query: string
+    dispatchQuery: (v: string) => void
     loading: boolean
 }
 export const SearchBar: FC<Props> = ({
     loading,
-    githubQuery,
-    setGithubQuery,
+    query,
+    dispatchQuery,
 }) => {
-    const { push } = useRouter()
     const [filterVisible, SetFilterVisible] = useState(false)
+    const [githubQuery, SetGithubQuery] = useState(query)
 
-    const queryObject = parseGithubQuery(githubQuery)
-
-    const updateQuery = () => {
-        push(`/?query=${githubQuery}`)
-    }
-
+    const queryObject = parseGithubQuery(query)
+    const updateQuery = () => dispatchQuery(githubQuery)
     return (
         <div className="my-3">
             <div className="flex flex-wrap justify-center">
@@ -66,14 +60,14 @@ export const SearchBar: FC<Props> = ({
                 </button>
                 <input
                     value={githubQuery}
-                    onChange={e => {
+                    onChange={(e) => {
                         if (e.target.value === '') {
-                            setGithubQuery(' ')
+                            SetGithubQuery(' ')
                         } else {
-                            setGithubQuery(e.target.value)
+                            SetGithubQuery(e.target.value)
                         }
                     }}
-                    onKeyPress={event => {
+                    onKeyPress={(event) => {
                         if (event.key === 'Enter') {
                             updateQuery()
                         }

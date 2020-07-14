@@ -1,12 +1,10 @@
+import uniqBy from 'lodash/uniqBy'
 import * as React from 'react'
 import { format } from 'timeago.js'
-import { PullRequest } from '../core/pullRequest'
-import fileIcon from '../../public/file.svg'
 import commentIcon from '../../public/comment.svg'
+import fileIcon from '../../public/file.svg'
 import viewIcon from '../../public/view.svg'
-import uniqBy from 'lodash/uniqBy'
-import avatarPlaceHolder from '../../public/avatar_placeholder.png'
-import { FC } from 'react'
+import { PullRequest } from '../core/pullRequest'
 import { LazyAvatar } from './LazyAvatar'
 
 type Props = {
@@ -15,12 +13,12 @@ type Props = {
 
 export const PullRequestCard: React.FC<Props> = ({ pullRequest }) => {
     const borderColor =
-        pullRequest.mergeable === 'MERGEABLE' ? '' : 'border border-red'
+        pullRequest.mergeable === 'MERGEABLE' ? '' : 'border-2 border-red'
     const opacity = pullRequest.state === 'OPEN' ? 'opacity-100' : 'opacity-25'
     const reviewers = uniqBy(
         pullRequest.reviews?.nodes
-            ?.map(x => x.author)
-            .filter(x => x?.login !== pullRequest.author?.login),
+            ?.map((x) => x.author)
+            .filter((x) => x?.login !== pullRequest.author?.login),
         'login'
     )
     return (
