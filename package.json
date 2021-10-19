@@ -39,7 +39,7 @@
     "@types/react-infinite-scroller": "1.2.1",
     "@types/react-lazyload": "2.6.0",
     "@types/react-transition-group": "4.4.0",
-    "autoprefixer": "9.8.5",
+    "autoprefixer": "9.8.8",
     "next-images": "1.4.0",
     "postcss-loader": "3.0.0",
     "prettier": "2.0.5",
