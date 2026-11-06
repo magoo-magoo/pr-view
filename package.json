@@ -27,7 +27,7 @@
     "react-lazyload": "^3.0.0",
     "react-progressive-image": "^0.6.0",
     "react-transition-group": "^4.4.1",
-    "react-use": "^15.0.0",
+    "react-use": "^17.0.0",
     "tailwindcss": "^1.4.6",
     "timeago.js": "^4.0.2"
   },
